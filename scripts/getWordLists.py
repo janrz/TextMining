@@ -2,27 +2,21 @@ import nltk, csv, os.path
 from nltk import FreqDist, re
 from nltk import word_tokenize
 
-TRANING_DATA_SET_PATH = "../data/testdata.manual.2009.06.14.csv"
-TEST_DATA_SET_PATH = "../data/training.1600000.processed.noemoticon.csv"
+TRAINING_DATA_SET_PATH = "../data/testdata.manual.2009.06.14.csv"
 OUTPUT_FILE_POSITIVE = "../output/positive words.txt"
 OUTPUT_FILE_NEGATIVE = "../output/negative words.txt"
 
 IDENTIFICATION_THRESHOLD = 3.
-MINIMUM_NUMBER_OF_OCCURRENCES = 1.
-NUMBER_OF_TWEETS_READ = 100
-MINIMUM_SCORE = 1
+MINIMUM_NUMBER_OF_OCCURRENCES = 2
+EXCLUDED_TAGS = ['IN', 'VB', 'NN', 'NNP', 'NNS', 'PRP', 'PRP$']
 
-def importDataSet(path, limitNumberOfTweetsRead = False):
+def importDataSet(path):
     dataSet = []
-    numberOfTweets = 0
     with open(path, "rb") as data:
         reader = csv.reader(data)
         for row in reader:
-            if numberOfTweets < NUMBER_OF_TWEETS_READ:
-                tweetData = (row[0], row[3], row[5], row[4], row[2]) # (sentiment, subject, tweet, author, date and time)
-                dataSet.append(tweetData)
-                if limitNumberOfTweetsRead:
-                    numberOfTweets += 1
+            tweetData = (row[0], row[3], row[5], row[4], row[2]) #(sentiment, subject, tweet, author, date and time)
+            dataSet.append(tweetData)
     return dataSet
 
 def filterTweets(dataSet):
@@ -30,14 +24,11 @@ def filterTweets(dataSet):
     for (sentiment, subject, words, author, datetime) in dataSet:
         tokenized = word_tokenize(words)
         tagged = nltk.pos_tag(tokenized)
-        #wordsFiltered = [x.lower() for x in tagged if len(x) >= 3 and not x[0] == '@']
-        
         wordsFiltered = []
         for (word, tag) in tagged:
             word = word.lower()
-            if len(word) >= 3 and not word[0] == '@' and not tag == 'NN':
+            if len(word) >= 3 and not word[0] == '@' and not tag in EXCLUDED_TAGS:
                 wordsFiltered.append(word)
-                
         filteredTweets.append((sentiment, subject, wordsFiltered))
     return filteredTweets
 
@@ -98,47 +89,19 @@ def listHasWord(wordList, testWord):
 def removeInfrequentWords(wordList):
     newList = []
     for (word, numberOfOccurrences) in wordList:
-        if numberOfOccurrences > MINIMUM_NUMBER_OF_OCCURRENCES:
+        if numberOfOccurrences >= MINIMUM_NUMBER_OF_OCCURRENCES:
             newList.append((word, numberOfOccurrences))
     return newList
- 
-def showTweets(tweets, wordList):
-    positiveWords = wordList[0]
-    negativeWords = wordList[1]
-    for (sentiment, subject, tweet, author, datetime) in tweets:
-        tweet = tweet.split()
-        positive = countWordsInCategory(tweet, positiveWords)
-        negative = countWordsInCategory(tweet, negativeWords)
-        wordScore = positive - negative
-        if wordScore >= MINIMUM_SCORE:
-            addTweetToFile(tweet, author, datetime, OUTPUT_FILE)
-    return
-    
-def countWordsInCategory(tweet, category):
-    counter = 0
-    for tweetWord in tweet:
-        for categoryWord in category:
-            if tweetWord == categoryWord[0]:
-                counter += 1
-    return counter
-
-def addTweetToFile(tweet, author, datetime, filename):
-    tweet = " ".join(tweet)
-    tweetData = []
-    tweetData.append(author)
-    tweetData.append(datetime)
-    tweetData.append(tweet)
-    if not os.path.isfile(filename):
-        textFile = open(filename, "w")
-    else:
-        textFile = open(filename, "a")
-    for element in tweetData:
-        textFile.write(element)
-        textFile.write("\n")
-    return
 
 def createFile(wordList, filename):
-    
+    textFile = open(filename, "w")
+    textFile.write(wordList[0])
+    textFile.write("\n")
+    textFile = open(filename, "a")
+    for word in wordList[1:]:
+        textFile.write(word)
+        textFile.write("\n")
+    return
 
 def removeExistingOutput(filename):
     if os.path.exists(filename):
@@ -146,8 +109,8 @@ def removeExistingOutput(filename):
     return
     
 #Import training data set
-trainingDataSet = importDataSet(TRANING_DATA_SET_PATH)
-
+trainingDataSet = importDataSet(TRAINING_DATA_SET_PATH)
+print "data set imported"
 '''
 Filter tweets:
 - All words will be turned into lowercase words
@@ -155,7 +118,7 @@ Filter tweets:
 - Remove words starting with <@>: word is a user name, likely to not be a real word
 '''
 filteredTweets = filterTweets(trainingDataSet)
-
+print "tweets filtered"
 '''
 Categorize tweets:
 - Create three lists, each containing all tweets belonging to the given category (0, 2 or 4)
@@ -166,6 +129,7 @@ Categorize tweets:
 negativeWords = categorizeTweets(filteredTweets, '0')
 neutralWords = categorizeTweets(filteredTweets, '2')
 positiveWords = categorizeTweets(filteredTweets, '4')
+print "word lists created"
 
 '''
 - A frequency distribution is made for each category
@@ -174,7 +138,7 @@ positiveWords = categorizeTweets(filteredTweets, '4')
 negativeList = freqDistToList(FreqDist(negativeWords))
 neutralList = freqDistToList(FreqDist(neutralWords))
 positiveList = freqDistToList(FreqDist(positiveWords))
-
+print "Frequency distributions created"
 '''
 Words occurring NUMBER_OF_OCCURRENCES or less are removed, because they will 
 probably not be useful in deciding whether a word is negative, positive or neutral
@@ -182,28 +146,21 @@ probably not be useful in deciding whether a word is negative, positive or neutr
 negativeList = removeInfrequentWords(negativeList)
 neutralList = removeInfrequentWords(neutralList)
 positiveList = removeInfrequentWords(positiveList)
-
+print "Infrequent words removed"
 '''
 If a word occurs more than IDENTIFICATION_THRESHOLD times more often in one list 
 than in both other lists it is considered to be a decisive word in categorizing a tweet.
 The word is then added to the list belonging to its category.
 '''
-trueNegativeList = compareWords(negativeList, neutralList, positiveList)
-trueNeutralList = compareWords(neutralList, negativeList, positiveList)
 truePositiveList = compareWords(positiveList, negativeList, neutralList)
+print "positive list created"
+trueNegativeList = compareWords(negativeList, neutralList, positiveList)
+print "negative list created"
 
-# #Add word lists to array
-# wordList = [truePositiveList, trueNegativeList]
-
-# #Import test data
-# testDataSet = importDataSet(TEST_DATA_SET_PATH, True)
-
-#Remove old output file if it exists
+#Remove old output files if they exist
 removeExistingOutput(OUTPUT_FILE_POSITIVE)
 removeExistingOutput(OUTPUT_FILE_NEGATIVE)
 
 #Export word lists to text files
 createFile(truePositiveList, OUTPUT_FILE_POSITIVE)
 createFile(trueNegativeList, OUTPUT_FILE_NEGATIVE)
-#Add all positive tweets to new text file.
-showTweets(testDataSet, wordList)
