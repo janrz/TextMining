@@ -1,43 +1,22 @@
 body {
+	font-family: "Arial";
 	background-color: #F9F9FF;
 }
 
-a:link {
-	font-family: "Arial";
-    color: lightblue;
-	text-decoration: none;
-}
-
-a:visited {
-	font-family: "Arial";
+a {
 	color: lightblue;
 	text-decoration: none;
 }
 
-a:hover {
-	font-family: "Arial";
-    color: lightblue;
-	text-decoration: none;
-}
-
-a:active {
-	font-family: "Arial";
-    color: lightblue;
-	text-decoration: none;
-}
-
 h1 { /*author name*/
-	font-family: "Arial";
     font-size: 14;
 }
 
 h2 { /*tweet text*/
-	font-family: "Arial";
 	font-size: 18;
 }
 
 h3 { /*date and time of tweet*/
-	font-family: "Arial";
 	font-size: 8;
 }
 

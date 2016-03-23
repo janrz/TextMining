@@ -5,6 +5,7 @@
 - grotere training set: nu te weinig woorden in lijsten
 - score toekennen per tweet: bijv in tuple zetten
 - een server zou leuk zijn
+- chronologische volgorde tweets
 
 tags:
 
