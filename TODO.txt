@@ -1,5 +1,4 @@
 - live twitter feed
-- twitter layout website
 - goede tags selecteren
 - woord niet meteen toevoegen als het niet in andere categorieën voorkomt: kan 3x niet gebruiken, wat dan?
 - grotere training set: nu te weinig woorden in lijsten

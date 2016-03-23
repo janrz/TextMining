@@ -7,9 +7,11 @@
 	
 	<body>
         <div id = "header"><a href = "index.php"><img src = "images/twitterlogo.png" alt = "Twitter Logo"></a></div>
+        <div id = "button">
+            Showing you positive tweets<br>
+            <a href = "index.php">Back to normal view</a>
+        </div>
 		<?php
-            ini_set('max_execution_time', 300);
-            
             $noTrainingSetWarning = "Unable to show tweets: the training set has not been processed yet. ";
             
             $positiveWords = "output/positive words.txt";
@@ -55,8 +57,8 @@
                 foreach ($tweets as $tweet) {
 					echo "<div id = \"tweet\">";
 					echo "<h2>" . $tweet[2] . "</h2>"; # show tweet
-					echo "<h2>" . $tweet[0] . "</h2>"; # show author
-					echo "<h2>" . $tweet[1] . "</h2>"; # show date and time
+                    echo "<h2><a href = \"https://www.twitter.com/" . $tweet[0] . "\">" . "@" . $tweet[0] . "</a></h2>"; # show author
+                    echo "<h2>" . $tweet[1] . "</h2>"; # show date and time
 					echo "</div>";
                 }
             } catch (Exception $e) {

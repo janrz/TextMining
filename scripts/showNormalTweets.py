@@ -1,7 +1,7 @@
-import 
+import csv, os.path
 
-TWEET_DATA_PATH = "../data/training.1600000.processed.noemoticon.csv"
-TWEETS_OUTPUT_FILE = "../output/all tweets.txt"
+TWEET_DATA_PATH = "data/training.1600000.processed.noemoticon.csv"
+TWEETS_OUTPUT_FILE = "output/all tweets.txt"
 NUMBER_OF_TWEETS_READ = 100
 
 def importDataSet(path, limitNumberOfTweetsRead = True):
@@ -18,7 +18,6 @@ def importDataSet(path, limitNumberOfTweetsRead = True):
     return dataSet
 	
 def addTweetToFile(tweet, author, datetime, filename):
-    tweet = " ".join(tweet)
     tweetData = []
     tweetData.append(author)
     tweetData.append(datetime)
@@ -32,7 +31,12 @@ def addTweetToFile(tweet, author, datetime, filename):
         textFile.write("\n")
     return
 
+def removeExistingOutput(filename):
+    if os.path.exists(filename):
+        os.remove(filename)
+    return
+    
 dataSet = importDataSet(TWEET_DATA_PATH)
-
+removeExistingOutput(TWEETS_OUTPUT_FILE)
 for (tweet, author, datetime) in dataSet:
 	addTweetToFile(tweet, author, datetime, TWEETS_OUTPUT_FILE)

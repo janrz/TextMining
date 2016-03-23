@@ -2,12 +2,13 @@ import nltk, csv, os.path
 from nltk import FreqDist, re
 from nltk import word_tokenize
 
-TRAINING_DATA_SET_PATH = "../data/testdata.manual.2009.06.14.csv"
-OUTPUT_FILE_POSITIVE = "../output/positive words.txt"
-OUTPUT_FILE_NEGATIVE = "../output/negative words.txt"
+TRAINING_DATA_SET_PATH = "data/test.csv"
+OUTPUT_FILE_POSITIVE = "output/positive words.txt"
+OUTPUT_FILE_NEGATIVE = "output/negative words.txt"
 
 IDENTIFICATION_THRESHOLD = 3.
 MINIMUM_NUMBER_OF_OCCURRENCES = 2
+MINIMUM_WORD_LENGTH = 4
 EXCLUDED_TAGS = ['IN', 'VB', 'NN', 'NNP', 'NNS', 'PRP', 'PRP$']
 
 def importDataSet(path):
@@ -23,20 +24,24 @@ def filterTweets(dataSet):
     filteredTweets = []
     for (sentiment, subject, words, author, datetime) in dataSet:
         tokenized = word_tokenize(words)
-        tagged = nltk.pos_tag(tokenized)
         wordsFiltered = []
-        for (word, tag) in tagged:
+        for word in tokenized:
             word = word.lower()
-            if len(word) >= 3 and not word[0] == '@' and not tag in EXCLUDED_TAGS:
+            if len(word) >= MINIMUM_WORD_LENGTH and not word[0] == '@':
                 wordsFiltered.append(word)
-        filteredTweets.append((sentiment, subject, wordsFiltered))
+        wordsTagged = nltk.pos_tag(wordsFiltered)
+        filteredAndTagged = []
+        for (word, tag) in wordsTagged:
+            if tag not in EXCLUDED_TAGS:
+                filteredAndTagged.append((word, tag))
+        filteredTweets.append((sentiment, subject, filteredAndTagged))
     return filteredTweets
 
 def categorizeTweets(tweets, category):
     categorizedTweets = []
     for tweet in tweets:
         if tweet[0] == category:
-            for word in tweet[2]:
+            for (word, tag) in tweet[2]:
                 word = reformatWord(word)
                 categorizedTweets.append(word)
     return categorizedTweets
@@ -95,12 +100,14 @@ def removeInfrequentWords(wordList):
 
 def createFile(wordList, filename):
     textFile = open(filename, "w")
-    textFile.write(wordList[0])
-    textFile.write("\n")
-    textFile = open(filename, "a")
-    for word in wordList[1:]:
-        textFile.write(word)
+    if len(wordList) >= 1:
+        textFile.write(wordList[0][0])
         textFile.write("\n")
+        if len(wordList) >= 2:
+            textFile = open(filename, "a")
+            for word in wordList[1:]:
+                textFile.write(word[0])
+                textFile.write("\n")
     return
 
 def removeExistingOutput(filename):
@@ -110,7 +117,8 @@ def removeExistingOutput(filename):
     
 #Import training data set
 trainingDataSet = importDataSet(TRAINING_DATA_SET_PATH)
-print "data set imported"
+print "Data set imported"
+
 '''
 Filter tweets:
 - All words will be turned into lowercase words
@@ -118,7 +126,8 @@ Filter tweets:
 - Remove words starting with <@>: word is a user name, likely to not be a real word
 '''
 filteredTweets = filterTweets(trainingDataSet)
-print "tweets filtered"
+print "Tweets filtered"
+
 '''
 Categorize tweets:
 - Create three lists, each containing all tweets belonging to the given category (0, 2 or 4)
@@ -129,7 +138,7 @@ Categorize tweets:
 negativeWords = categorizeTweets(filteredTweets, '0')
 neutralWords = categorizeTweets(filteredTweets, '2')
 positiveWords = categorizeTweets(filteredTweets, '4')
-print "word lists created"
+print "Word lists created"
 
 '''
 - A frequency distribution is made for each category
@@ -139,6 +148,7 @@ negativeList = freqDistToList(FreqDist(negativeWords))
 neutralList = freqDistToList(FreqDist(neutralWords))
 positiveList = freqDistToList(FreqDist(positiveWords))
 print "Frequency distributions created"
+
 '''
 Words occurring NUMBER_OF_OCCURRENCES or less are removed, because they will 
 probably not be useful in deciding whether a word is negative, positive or neutral
@@ -147,20 +157,23 @@ negativeList = removeInfrequentWords(negativeList)
 neutralList = removeInfrequentWords(neutralList)
 positiveList = removeInfrequentWords(positiveList)
 print "Infrequent words removed"
+
 '''
 If a word occurs more than IDENTIFICATION_THRESHOLD times more often in one list 
 than in both other lists it is considered to be a decisive word in categorizing a tweet.
 The word is then added to the list belonging to its category.
 '''
 truePositiveList = compareWords(positiveList, negativeList, neutralList)
-print "positive list created"
+print "Positive word list created"
 trueNegativeList = compareWords(negativeList, neutralList, positiveList)
-print "negative list created"
+print "Negative word list created"
 
 #Remove old output files if they exist
 removeExistingOutput(OUTPUT_FILE_POSITIVE)
 removeExistingOutput(OUTPUT_FILE_NEGATIVE)
+print "Old output deleted"
 
 #Export word lists to text files
 createFile(truePositiveList, OUTPUT_FILE_POSITIVE)
 createFile(trueNegativeList, OUTPUT_FILE_NEGATIVE)
+print "Output created"
