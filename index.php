@@ -10,7 +10,8 @@
 			<div id = "header"><a href = "index.php"><img src = "images/twitterlogo.png" alt = "Twitter Logo"></a></div>
 		</div>
 		<div id = "button">
-			<a href = "positivetweets.php">Show positive tweets</a>
+			<a href = "positivetweets.php">Show positive tweets</a> or
+            <a href = "runTrainingSet.php">Run training set</a> 
 		</div>
 		<?php
             #python script is executed

@@ -2,7 +2,7 @@ import nltk, csv, os.path
 from nltk import FreqDist, re
 from nltk import word_tokenize
 
-TRAINING_DATA_SET_PATH = "data/test.csv"
+TRAINING_DATA_SET_PATH = "data/testdata.manual.2009.06.14.csv"
 OUTPUT_FILE_POSITIVE = "output/positive words.txt"
 OUTPUT_FILE_NEGATIVE = "output/negative words.txt"
 
@@ -10,7 +10,7 @@ IDENTIFICATION_THRESHOLD = 3.
 MINIMUM_NUMBER_OF_OCCURRENCES = 2
 MINIMUM_WORD_LENGTH = 4
 EXCLUDED_TAGS = ['IN', 'VB', 'NN', 'NNP', 'NNS', 'PRP', 'PRP$']
-
+counter = 1
 def importDataSet(path):
     dataSet = []
     with open(path, "rb") as data:
@@ -21,6 +21,7 @@ def importDataSet(path):
     return dataSet
 
 def filterTweets(dataSet):
+    global counter
     filteredTweets = []
     for (sentiment, subject, words, author, datetime) in dataSet:
         tokenized = word_tokenize(words)
@@ -35,6 +36,8 @@ def filterTweets(dataSet):
             if tag not in EXCLUDED_TAGS:
                 filteredAndTagged.append((word, tag))
         filteredTweets.append((sentiment, subject, filteredAndTagged))
+        print counter
+        counter += 1
     return filteredTweets
 
 def categorizeTweets(tweets, category):
@@ -117,7 +120,7 @@ def removeExistingOutput(filename):
     
 #Import training data set
 trainingDataSet = importDataSet(TRAINING_DATA_SET_PATH)
-print "Data set imported"
+print "Data set of %i tweets imported" % len(trainingDataSet)
 
 '''
 Filter tweets:
@@ -177,3 +180,4 @@ print "Old output deleted"
 createFile(truePositiveList, OUTPUT_FILE_POSITIVE)
 createFile(trueNegativeList, OUTPUT_FILE_NEGATIVE)
 print "Output created"
+print "\nProgram finished"

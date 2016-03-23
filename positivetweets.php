@@ -8,8 +8,7 @@
 	<body>
         <div id = "header"><a href = "index.php"><img src = "images/twitterlogo.png" alt = "Twitter Logo"></a></div>
         <div id = "button">
-            Showing you positive tweets<br>
-            <a href = "index.php">Back to normal view</a>
+            Showing you positive tweets
         </div>
 		<?php
             $noTrainingSetWarning = "Unable to show tweets: the training set has not been processed yet. ";
