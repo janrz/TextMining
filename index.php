@@ -6,8 +6,11 @@
 	</head>
 	
 	<body>
-        <div id = "header"><img src="images/twitterlogo.png" alt = "Twitter Logo"></div>
-        <h1>Test</h1>
-        <a href = "positivetweets.php">Show positive tweets</a>
+        <div id = "header">
+			<div id = "header"><a href = "index.php"><img src = "images/twitterlogo.png" alt = "Twitter Logo"></a></div>
+		</div>
+		<div id = "button">
+			<a href = "positivetweets.php">Show positive tweets</a>
+		</div>
 	</body>
 </html>

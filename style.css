@@ -1,14 +1,72 @@
-a {
-    color: orange
+body {
+	background-color: #F9F9FF;
 }
 
-h1 {
-    color: blue
-    size: 16
+a:link {
+	font-family: "Arial";
+    color: lightblue;
+	text-decoration: none;
+}
+
+a:visited {
+	font-family: "Arial";
+	color: lightblue;
+	text-decoration: none;
+}
+
+a:hover {
+	font-family: "Arial";
+    color: lightblue;
+	text-decoration: none;
+}
+
+a:active {
+	font-family: "Arial";
+    color: lightblue;
+	text-decoration: none;
+}
+
+h1 { /*author name*/
+	font-family: "Arial";
+    font-size: 14;
+}
+
+h2 { /*tweet text*/
+	font-family: "Arial";
+	font-size: 18;
+}
+
+h3 { /*date and time of tweet*/
+	font-family: "Arial";
+	font-size: 8;
 }
 
 #header {
     width: 550px;
     margin-left: auto;
     margin-right: auto;
+}
+
+#button {
+	width: 400px;
+	height: 150px;
+    margin-left: auto;
+    margin-right: auto;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 150px;
+}
+
+#tweet {
+	width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+	border-style: solid;
+	border-width: 1px;
+	border-color: lightgrey;
+	background-color: white;
+}
+
+#tweet:hover {
+	background-color: #F9F9FF;
 }

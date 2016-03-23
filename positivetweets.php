@@ -6,7 +6,7 @@
 	</head>
 	
 	<body>
-        <div id = "header"><img src="images/twitterlogo.png" alt = "Twitter Logo"></div>
+        <div id = "header"><a href = "index.php"><img src = "images/twitterlogo.png" alt = "Twitter Logo"></a></div>
 		<?php
             ini_set('max_execution_time', 300);
             
@@ -18,6 +18,7 @@
             try {
                 if (!file_exists($positiveWords) || !file_exists($negativeWords)) {
                     echo "<a href = \"runTrainingSet.php\">Run training set</a> Warning: might take a while.\n";
+					echo "<br>";
                     throw new Exception($noTrainingSetWarning);
                 }
                 #python script is executed
@@ -52,16 +53,16 @@
                 
                 #show tweets on page
                 foreach ($tweets as $tweet) {
-                    echo nl2br("Author: " . $tweet[0]) . "\n";
-                    echo nl2br("Date and time: " . $tweet[1]) . "\n";
-                    echo nl2br($tweet[2]) . "\n";
+					echo "<div id = \"tweet\">";
+					echo "<h2>" . $tweet[2] . "</h2>"; # show tweet
+					echo "<h2>" . $tweet[0] . "</h2>"; # show author
+					echo "<h2>" . $tweet[1] . "</h2>"; # show date and time
+					echo "</div>";
                 }
             } catch (Exception $e) {
                 echo $e;
                 
             }
-            
-            
 		?>
 	</body>
 </html>

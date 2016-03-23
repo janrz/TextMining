@@ -3,6 +3,8 @@
 - goede tags selecteren
 - woord niet meteen toevoegen als het niet in andere categorieën voorkomt: kan 3x niet gebruiken, wat dan?
 - grotere training set: nu te weinig woorden in lijsten
+- score toekennen per tweet: bijv in tuple zetten
+- een server zou leuk zijn
 
 tags:
 
